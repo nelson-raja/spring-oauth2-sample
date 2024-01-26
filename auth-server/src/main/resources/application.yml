@@ -1,0 +1,14 @@
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          crm-client:
+            require-authorization-consent: true
+            registration:
+              client-id: crm
+              client-secret: "{noop}crm"
+              authorization-grant-types: client_credentials, authorization_code, refresh_token
+              redirect_uris: http://127.0.0.1/login/oauth2/code/spring
+              scopes: user.read, user.write, openid
+              client-authentication-methods: client_secret_basic
