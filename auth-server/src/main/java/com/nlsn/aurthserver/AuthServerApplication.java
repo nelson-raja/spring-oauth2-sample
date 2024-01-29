@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.User;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -95,10 +98,27 @@ class ClientsConfiguration {
 								})
 								.redirectUri("http://127.0.0.1:8082/login/oauth2/code/spring")
 								.scopes(scopes -> scopes.addAll(Set.of("user.read", "user.write", OidcScopes.OPENID)))
+								.clientSettings.se
 								.build()
 				);
 			}
 		};
+	}
+
+}
+
+@Configuration
+class AuthorizationConfiguration{
+
+	@Bean
+	JdbcOAuth2AuthorizationConsentService jdbcOAuth2AuthorizationConsentService(
+			JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository){
+		return new JdbcOAuth2AuthorizationConsentService(jdbcOperations, registeredClientRepository);
+	}
+
+	@Bean
+	JdbcOAuth2AuthorizationService jdbcOAuth2AuthorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository){
+		return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
 	}
 
 }
